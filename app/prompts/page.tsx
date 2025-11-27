@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { PromptLibraryItem } from '@/lib/types';
+import { PromptLibraryItem, ViewMode } from '@/lib/types';
+import ContactModal from '@/components/ContactModal';
 
 export default function PromptsPage() {
   const [prompts, setPrompts] = useState<PromptLibraryItem[]>([]);
@@ -13,6 +14,14 @@ export default function PromptsPage() {
   const [showCopied, setShowCopied] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('promptsViewMode') as ViewMode) || 'card';
+    }
+    return 'card';
+  });
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [sortBy, setSortBy] = useState<'a-z' | 'z-a' | 'category'>('a-z');
 
   // Fetch all prompts
   useEffect(() => {
@@ -43,14 +52,26 @@ export default function PromptsPage() {
     fetchPrompts();
   }, []);
 
-  // Apply category filter
+  // Apply category filter and sorting
   useEffect(() => {
-    if (selectedCategory) {
-      setFilteredPrompts(prompts.filter(p => p.category === selectedCategory));
-    } else {
-      setFilteredPrompts(prompts);
-    }
-  }, [selectedCategory, prompts]);
+    let filtered = selectedCategory
+      ? prompts.filter(p => p.category === selectedCategory)
+      : prompts;
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === 'a-z') {
+        return a.title.localeCompare(b.title);
+      } else if (sortBy === 'z-a') {
+        return b.title.localeCompare(a.title);
+      } else if (sortBy === 'category') {
+        return (a.category || '').localeCompare(b.category || '');
+      }
+      return 0;
+    });
+
+    setFilteredPrompts(sorted);
+  }, [selectedCategory, prompts, sortBy]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -68,6 +89,11 @@ export default function PromptsPage() {
       }
       return next;
     });
+  };
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('promptsViewMode', mode);
   };
 
   if (loading) {
@@ -116,23 +142,31 @@ export default function PromptsPage() {
 
       {/* Header */}
       <header className="header-gradient text-white py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold">Prompt Library</h1>
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-3xl md:text-4xl font-bold">PROMPT LIBRARY</h1>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Instructions */}
         <div className="bg-orange/10 border-2 border-orange rounded-lg p-4 mb-6">
-          <p className="text-text-primary text-sm">
-            <strong>How to use:</strong> Click the copy button on any prompt to use it as a starting point for your own AI image creations.
-            See which photography terms create stunning results!
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-text-primary text-sm">
+              <strong>How to use:</strong> Click any image to view it full size. Select 'Show AI prompt' to reveal and copy the complete prompt. Customize with different photography terms from the dictionary to create your own AI images!
+            </p>
+            <button
+              onClick={() => setShowContactModal(true)}
+              className="text-sm text-teal hover:text-orange transition font-medium underline whitespace-nowrap ml-4"
+            >
+              📬 Request a prompt
+            </button>
+          </div>
         </div>
 
-        {/* Category Filter */}
-        {categories.length > 0 && (
-          <div className="mb-6">
+        {/* Category Filter, Sort, and View Mode */}
+        <div className="mb-6 flex items-center justify-between gap-4">
+          {/* Category Filter */}
+          {categories.length > 0 && (
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedCategory('')}
@@ -158,8 +192,47 @@ export default function PromptsPage() {
                 </button>
               ))}
             </div>
+          )}
+
+          {/* Sort and View Mode */}
+          <div className="flex items-center gap-3">
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-text-primary">Sort:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'a-z' | 'z-a' | 'category')}
+                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange"
+              >
+                <option value="a-z">A-Z</option>
+                <option value="z-a">Z-A</option>
+                <option value="category">By Category</option>
+              </select>
+            </div>
+
+            {/* View Mode */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleViewModeChange('card')}
+                className={`p-2 rounded-lg transition ${viewMode === 'card' ? 'bg-orange text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'}`}
+                title="Card view"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleViewModeChange('table')}
+                className={`p-2 rounded-lg transition ${viewMode === 'table' ? 'bg-orange text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'}`}
+                title="List view"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+                </svg>
+              </button>
+            </div>
           </div>
-        )}
+        </div>
 
         {/* Prompts Display */}
         {filteredPrompts.length === 0 ? (
@@ -169,7 +242,7 @@ export default function PromptsPage() {
               Add example prompts to the prompt_library table in Supabase.
             </p>
           </div>
-        ) : (
+        ) : viewMode === 'card' ? (
           <div className="grid md:grid-cols-2 gap-6">
             {filteredPrompts.map(prompt => (
               <div key={prompt.id} className="card">
@@ -202,10 +275,10 @@ export default function PromptsPage() {
                           }}
                           className="text-xs text-text-secondary italic text-center mt-2 w-full hover:text-orange hover:scale-105 transition"
                         >
-                          View image and prompt ⤢
+                          Show AI prompt ⤢
                         </button>
                       ) : (
-                        <p className="text-xs text-text-secondary italic text-center mt-1">Click to expand</p>
+                        <p className="text-xs text-text-secondary italic text-center mt-2 w-full">Click to expand</p>
                       )}
                     </div>
                   )}
@@ -226,13 +299,12 @@ export default function PromptsPage() {
                         <strong className="text-sm text-text-primary">Dictionary Terms Used:</strong>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {prompt.terms_used.map((term, idx) => (
-                            <a
+                            <span
                               key={idx}
-                              href={`/dictionary?search=${encodeURIComponent(term)}`}
-                              className="text-xs px-2 py-1 bg-gray-100 hover:bg-orange hover:text-white rounded-full text-text-primary transition"
+                              className="text-xs px-2 py-1 bg-gray-100 rounded-full text-text-primary"
                             >
                               {term}
-                            </a>
+                            </span>
                           ))}
                         </div>
                       </div>
@@ -299,8 +371,127 @@ export default function PromptsPage() {
               </div>
             ))}
           </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredPrompts.map(prompt => (
+              <div key={prompt.id} className="card">
+                <div className="flex gap-4">
+                  {/* Left side - Image Thumbnail */}
+                  {prompt.image_url && (
+                    <div className="flex-shrink-0">
+                      <button
+                        onClick={() => setLightboxImage(prompt.image_url!)}
+                        className="relative group w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-orange transition block"
+                      >
+                        <img
+                          src={prompt.image_url}
+                          alt={prompt.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                          </svg>
+                        </div>
+                      </button>
+                      {/* Show AI prompt button under thumbnail */}
+                      {prompt.complete_prompt && (
+                        <button
+                          onClick={() => togglePromptExpansion(prompt.id)}
+                          className="text-xs text-text-secondary italic text-center mt-2 w-full hover:text-orange hover:scale-105 transition"
+                        >
+                          Show AI prompt ⤢
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Right side - Content */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-text-primary mb-1">{prompt.title}</h3>
+                    {prompt.description && (
+                      <p className="text-sm text-text-secondary mb-2">{prompt.description}</p>
+                    )}
+
+                    {/* Dictionary Terms Used */}
+                    {prompt.terms_used.length > 0 && (
+                      <div className="mb-2">
+                        <strong className="text-xs text-text-primary">Dictionary Terms Used:</strong>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {prompt.terms_used.map((term, idx) => (
+                            <span
+                              key={idx}
+                              className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-text-primary"
+                            >
+                              {term}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Photography Prompt Terms - Inline */}
+                    <div className="mb-2">
+                      <strong className="text-xs text-text-primary">Photography Prompt Terms:</strong>
+                      <div className="relative mt-1">
+                        <div className="bg-gray-100 px-2 py-1 rounded text-xs font-mono pr-8">
+                          {prompt.full_prompt}
+                        </div>
+                        <button
+                          onClick={() => copyToClipboard(prompt.full_prompt)}
+                          className="absolute top-1/2 -translate-y-1/2 right-1 text-orange hover:text-navy transition"
+                          title="Copy prompt"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Complete Prompt */}
+                {prompt.complete_prompt && expandedPrompts.has(prompt.id) && (
+                  <div className="mt-3 bg-teal/5 border border-teal rounded-lg p-3 relative">
+                    <button
+                      onClick={() => togglePromptExpansion(prompt.id)}
+                      className="absolute top-2 right-2 text-text-secondary hover:text-navy transition"
+                      title="Close"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="flex items-start gap-2 mb-2 pr-6">
+                      <strong className="text-sm text-text-primary">Complete AI Prompt:</strong>
+                      <button
+                        onClick={() => copyToClipboard(prompt.complete_prompt!)}
+                        className="text-orange hover:text-navy transition ml-auto"
+                        title="Copy complete prompt"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <p className="text-sm font-mono text-text-primary bg-white p-2 rounded border border-teal/20">
+                      {prompt.complete_prompt}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        formType="prompt"
+      />
     </div>
   );
 }

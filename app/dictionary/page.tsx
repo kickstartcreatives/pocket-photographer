@@ -11,7 +11,12 @@ export default function DictionaryPage() {
   const [filteredTerms, setFilteredTerms] = useState<PhotographyTerm[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>({ search: '', categories: [] });
-  const [viewMode, setViewMode] = useState<ViewMode>('card');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('dictionaryViewMode') as ViewMode) || 'card';
+    }
+    return 'card';
+  });
   const [sortOption, setSortOption] = useState<SortOption>('term-asc');
   const [loading, setLoading] = useState(true);
   const [showCopied, setShowCopied] = useState(false);
@@ -129,6 +134,11 @@ export default function DictionaryPage() {
     setSelectedTerms([]);
   };
 
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('dictionaryViewMode', mode);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -151,8 +161,8 @@ export default function DictionaryPage() {
 
       {/* Header */}
       <header className="header-gradient text-white py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold">Photography Dictionary</h1>
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-3xl md:text-4xl font-bold">PHOTOGRAPHY DICTIONARY</h1>
         </div>
       </header>
 
@@ -237,16 +247,22 @@ export default function DictionaryPage() {
           {/* View Mode */}
           <div className="flex gap-2">
             <button
-              onClick={() => setViewMode('card')}
-              className={`px-4 py-2 rounded-lg ${viewMode === 'card' ? 'bg-teal text-white' : 'bg-gray-200'}`}
+              onClick={() => handleViewModeChange('card')}
+              className={`p-2 rounded-lg transition ${viewMode === 'card' ? 'bg-orange text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'}`}
+              title="Card view"
             >
-              Cards
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+              </svg>
             </button>
             <button
-              onClick={() => setViewMode('table')}
-              className={`px-4 py-2 rounded-lg ${viewMode === 'table' ? 'bg-teal text-white' : 'bg-gray-200'}`}
+              onClick={() => handleViewModeChange('table')}
+              className={`p-2 rounded-lg transition ${viewMode === 'table' ? 'bg-orange text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'}`}
+              title="Table view"
             >
-              Table
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+              </svg>
             </button>
           </div>
         </div>
@@ -331,7 +347,7 @@ export default function DictionaryPage() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-teal text-white">
-                  <th className="p-3 text-left">Element</th>
+                  <th className="p-3 text-left">Term</th>
                   <th className="p-3 text-left">Category</th>
                   <th className="p-3 text-left">What It Does</th>
                   <th className="p-3 text-left">Best Used For</th>
@@ -343,13 +359,33 @@ export default function DictionaryPage() {
                   <tr key={term.id} className="border-b border-border-gray hover:bg-gray-50">
                     <td className="p-3">
                       <div className="relative inline-block min-w-[120px]">
-                        <div className="bg-gray-100 p-2 rounded text-sm font-mono pr-8">
-                          {term.element}
-                        </div>
                         <button
-                          onClick={() => copyToClipboard(term.element)}
+                          onClick={() => toggleTermSelection(term.element)}
+                          className={`w-full text-left bg-gray-200 p-2 rounded text-sm font-mono pr-8 border transition ${
+                            selectedTerms.includes(term.element)
+                              ? 'ring-2 ring-orange bg-orange/10 border-orange'
+                              : 'border-gray-300 hover:bg-gray-300'
+                          }`}
+                          title="Click to add to prompt builder"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="flex-1">{term.element}</span>
+                            {selectedTerms.includes(term.element) && (
+                              <span className="text-orange absolute right-8" title="Added to prompt builder">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                                </svg>
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(term.element);
+                          }}
                           className="absolute top-1 right-1 text-orange hover:text-navy transition"
-                          title="Copy element"
+                          title="Copy term only"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
