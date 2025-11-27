@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { PhotographyTerm, Filters, ViewMode, SortOption } from '@/lib/types';
 
-export default function DictionaryPage() {
+function DictionaryContent() {
   const searchParams = useSearchParams();
   const [terms, setTerms] = useState<PhotographyTerm[]>([]);
   const [filteredTerms, setFilteredTerms] = useState<PhotographyTerm[]>([]);
@@ -415,5 +415,13 @@ export default function DictionaryPage() {
       </div>
 
     </div>
+  );
+}
+
+export default function DictionaryPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-lg text-text-secondary">Loading dictionary...</div></div>}>
+      <DictionaryContent />
+    </Suspense>
   );
 }
