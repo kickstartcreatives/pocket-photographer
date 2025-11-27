@@ -32,7 +32,8 @@ Open `.env.local` and replace the placeholder values:
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...your-anon-key...
 SUPABASE_SERVICE_KEY=eyJhbGc...your-service-key...
-RESEND_API_KEY=re_7KVpkTBx_B5squ3aiZAZpF4HDoznaT1kp
+# Using Web3Forms instead of Resend
+WEB3FORMS_ACCESS_KEY=your-web3forms-access-key
 CONTACT_EMAIL=prompts@kickstartcreatives.com
 ```
 
