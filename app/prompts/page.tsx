@@ -250,9 +250,9 @@ export default function PromptsPage() {
                   {/* Left side - Image Thumbnail */}
                   {prompt.image_url && (
                     <div className="flex-shrink-0">
-                      <button
+                      <div
                         onClick={() => setLightboxImage(prompt.image_url!)}
-                        className="relative group w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-orange transition block"
+                        className="relative group w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-orange transition cursor-pointer"
                       >
                         <img
                           src={prompt.image_url}
@@ -264,21 +264,19 @@ export default function PromptsPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
                           </svg>
                         </div>
-                      </button>
-                      {/* Combined action text */}
-                      {prompt.complete_prompt ? (
+                      </div>
+                      {/* Show AI prompt button under thumbnail */}
+                      {prompt.complete_prompt && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setLightboxImage(prompt.image_url!);
+                            e.preventDefault();
                             togglePromptExpansion(prompt.id);
                           }}
                           className="text-xs text-text-secondary italic text-center mt-2 w-full hover:text-orange hover:scale-105 transition"
                         >
                           Show AI prompt ⤢
                         </button>
-                      ) : (
-                        <p className="text-xs text-text-secondary italic text-center mt-2 w-full">Click to expand</p>
                       )}
                     </div>
                   )}
@@ -397,7 +395,10 @@ export default function PromptsPage() {
                       {/* Show AI prompt button under thumbnail */}
                       {prompt.complete_prompt && (
                         <button
-                          onClick={() => togglePromptExpansion(prompt.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            togglePromptExpansion(prompt.id);
+                          }}
                           className="text-xs text-text-secondary italic text-center mt-2 w-full hover:text-orange hover:scale-105 transition"
                         >
                           Show AI prompt ⤢
