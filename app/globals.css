@@ -41,9 +41,9 @@ body {
   background: radial-gradient(ellipse at center, #6b8b9d 0%, var(--teal) 40%, var(--navy) 100%);
 }
 
-/* Primary button style */
+/* Primary button style - Navy */
 .btn-primary {
-  background-color: var(--orange);
+  background-color: var(--navy);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -52,7 +52,21 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #b33905;
+  background-color: var(--teal);
+}
+
+/* Orange button style */
+.btn-orange {
+  background-color: var(--orange) !important;
+  color: white !important;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-orange:hover {
+  background-color: #b33905 !important;
 }
 
 /* Card style */
