@@ -10,13 +10,15 @@ type Tab = 'terms' | 'prompts' | 'platforms';
 
 export default function AdminPage() {
   // Create supabase client on the client side only
-  const supabaseAdmin = typeof window !== 'undefined'
-    ? createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
-        { auth: { autoRefreshToken: false, persistSession: false } }
-      )
-    : null;
+  const [supabaseAdmin] = useState(() =>
+    typeof window !== 'undefined'
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
+          { auth: { autoRefreshToken: false, persistSession: false } }
+        )
+      : null
+  );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
