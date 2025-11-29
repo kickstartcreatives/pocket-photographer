@@ -6,6 +6,16 @@ import { PhotographyTerm, PromptLibraryItem } from '@/lib/types';
 import ImageUpload from '@/components/ImageUpload';
 import { getAIPlatforms, saveAIPlatforms, DEFAULT_AI_PLATFORMS } from '@/lib/ai-platforms';
 
+// Create admin client for forms
+const getSupabaseAdmin = () => {
+  if (typeof window === 'undefined') return null;
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+};
+
 type Tab = 'terms' | 'prompts' | 'platforms';
 
 export default function AdminPage() {
@@ -84,7 +94,7 @@ export default function AdminPage() {
 
   const fetchTerms = async () => {
     if (!supabaseAdmin) return;
-    const { data, error } = await supabaseAdmin!
+    const { data, error } = await getSupabaseAdmin()!
       .from('photography_terms')
       .select('*')
       .order('element', { ascending: true });
@@ -99,7 +109,7 @@ export default function AdminPage() {
   const fetchPrompts = async () => {
     if (!supabaseAdmin) return;
     console.log('Fetching prompts...');
-    const { data, error } = await supabaseAdmin!
+    const { data, error } = await getSupabaseAdmin()!
       .from('prompt_library')
       .select('*')
       .order('created_at', { ascending: false });
@@ -115,7 +125,7 @@ export default function AdminPage() {
   const deleteTerm = async (id: string) => {
     if (!supabaseAdmin || !confirm('Are you sure you want to delete this term?')) return;
 
-    const { error } = await supabaseAdmin!
+    const { error } = await getSupabaseAdmin()!
       .from('photography_terms')
       .delete()
       .eq('id', id);
@@ -130,7 +140,7 @@ export default function AdminPage() {
   const deletePrompt = async (id: string) => {
     if (!supabaseAdmin || !confirm('Are you sure you want to delete this prompt?')) return;
 
-    const { error } = await supabaseAdmin!
+    const { error } = await getSupabaseAdmin()!
       .from('prompt_library')
       .delete()
       .eq('id', id);
@@ -600,7 +610,7 @@ function TermForm({ term, onClose, onSave, showToast }: {
 
     if (term) {
       // Update existing
-      const { error } = await supabaseAdmin!
+      const { error } = await getSupabaseAdmin()!
         .from('photography_terms')
         .update(formData)
         .eq('id', term.id);
@@ -613,7 +623,7 @@ function TermForm({ term, onClose, onSave, showToast }: {
       }
     } else {
       // Create new
-      const { error } = await supabaseAdmin!
+      const { error } = await getSupabaseAdmin()!
         .from('photography_terms')
         .insert([formData]);
 
@@ -789,7 +799,7 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
     if (prompt) {
       // Update existing
       console.log('Updating prompt:', prompt.id, 'with data:', submitData);
-      const { data, error } = await supabaseAdmin!
+      const { data, error } = await getSupabaseAdmin()!
         .from('prompt_library')
         .update(submitData)
         .eq('id', prompt.id)
@@ -806,7 +816,7 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
     } else {
       // Create new
       console.log('Creating prompt with data:', submitData);
-      const { data, error } = await supabaseAdmin!
+      const { data, error } = await getSupabaseAdmin()!
         .from('prompt_library')
         .insert([submitData])
         .select();
