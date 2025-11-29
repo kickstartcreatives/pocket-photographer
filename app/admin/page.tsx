@@ -741,7 +741,6 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
       style: '',
       description: '',
       complete_prompt: '',
-      full_prompt: '',
       ai_platform: '',
       image_url: '',
       terms_used: [],
@@ -767,7 +766,6 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
     // Prepare data with derived fields
     const submitData = {
       ...formData,
-      full_prompt: formData.complete_prompt || formData.full_prompt || '',
       category: formData.style?.split(' ')[0] || '' // Extract first word from style as category
     };
 

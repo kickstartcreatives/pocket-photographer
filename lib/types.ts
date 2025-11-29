@@ -17,7 +17,6 @@ export interface PromptLibraryItem {
   title: string;
   description?: string;
   complete_prompt?: string;
-  full_prompt?: string;
   ai_platform: string;
   image_url?: string;
   terms_used: string[];
