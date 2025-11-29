@@ -28,6 +28,7 @@
 
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  --font-montserrat: var(--font-montserrat);
 }
 
 body {

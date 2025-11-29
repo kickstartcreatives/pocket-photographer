@@ -4,7 +4,7 @@ export default function HomePage() {
       {/* Header with gradient */}
       <header className="header-gradient text-white py-12 px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-montserrat uppercase tracking-wide">
             Pocket Photographer
           </h1>
           <p className="text-xl md:text-2xl opacity-90">
