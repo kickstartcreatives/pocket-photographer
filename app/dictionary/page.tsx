@@ -345,6 +345,14 @@ function DictionaryContent() {
                 </div>
                 <p className="text-sm text-text-secondary mb-3">{term.what_it_does}</p>
                 <div className="space-y-2 text-sm">
+                  {term.prompt_style && (
+                    <div>
+                      <strong className="text-text-primary">Style:</strong>
+                      <span className="ml-2 inline-block bg-orange/10 text-orange px-2 py-1 rounded text-xs font-medium">
+                        {term.prompt_style}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <strong className="text-text-primary">Best For:</strong>
                     <p className="text-text-secondary">{term.best_used_for}</p>
@@ -364,6 +372,7 @@ function DictionaryContent() {
                 <tr className="bg-teal text-white">
                   <th className="p-3 text-left">Term</th>
                   <th className="p-3 text-left">Category</th>
+                  <th className="p-3 text-left">Style</th>
                   <th className="p-3 text-left">What It Does</th>
                   <th className="p-3 text-left">Best Used For</th>
                   <th className="p-3 text-left">Example Usage</th>
@@ -400,6 +409,15 @@ function DictionaryContent() {
                       </div>
                     </td>
                     <td className="p-3 text-sm">{term.category}</td>
+                    <td className="p-3 text-sm">
+                      {term.prompt_style ? (
+                        <span className="inline-block bg-orange/10 text-orange px-2 py-1 rounded text-xs font-medium">
+                          {term.prompt_style}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
                     <td className="p-3 text-sm">{term.what_it_does}</td>
                     <td className="p-3 text-sm">{term.best_used_for}</td>
                     <td className="p-3 text-sm">{term.example_prompt_usage}</td>
