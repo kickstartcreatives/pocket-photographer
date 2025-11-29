@@ -9,11 +9,25 @@ import { getAIPlatforms, saveAIPlatforms, DEFAULT_AI_PLATFORMS } from '@/lib/ai-
 // Create admin client for forms
 const getSupabaseAdmin = () => {
   if (typeof window === 'undefined') return null;
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+
+  console.log('Creating Supabase admin client:', {
+    hasUrl: !!url,
+    hasKey: !!key,
+    url: url?.substring(0, 20) + '...',
+    key: key?.substring(0, 20) + '...'
+  });
+
+  if (!url || !key) {
+    console.error('Missing Supabase credentials!');
+    return null;
+  }
+
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
 };
 
 type Tab = 'terms' | 'prompts' | 'platforms';
