@@ -206,38 +206,37 @@ export default function PromptsPage() {
           </div>
         )}
 
-        {/* Style Filter, Sort, and View Mode */}
-        <div className="mb-6 flex items-center justify-between gap-4">
-          {/* Style Filter */}
-          {styles.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+        {/* Style Filter */}
+        {styles.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedStyle('')}
+              className={`px-3 py-1 rounded-full text-sm transition ${
+                !selectedStyle
+                  ? 'bg-orange text-white'
+                  : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+              }`}
+            >
+              All Styles
+            </button>
+            {styles.map(style => (
               <button
-                onClick={() => setSelectedStyle('')}
+                key={style}
+                onClick={() => setSelectedStyle(style)}
                 className={`px-3 py-1 rounded-full text-sm transition ${
-                  !selectedStyle
+                  selectedStyle === style
                     ? 'bg-orange text-white'
                     : 'bg-gray-200 text-text-primary hover:bg-gray-300'
                 }`}
               >
-                All Styles
+                {style}
               </button>
-              {styles.map(style => (
-                <button
-                  key={style}
-                  onClick={() => setSelectedStyle(style)}
-                  className={`px-3 py-1 rounded-full text-sm transition ${
-                    selectedStyle === style
-                      ? 'bg-orange text-white'
-                      : 'bg-gray-200 text-text-primary hover:bg-gray-300'
-                  }`}
-                >
-                  {style}
-                </button>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          {/* Sort and View Mode */}
+        {/* Sort and View Mode */}
+        <div className="mb-6 flex items-center justify-end gap-4">
           <div className="flex items-center gap-3">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
