@@ -206,9 +206,10 @@ export default function PromptsPage() {
           </div>
         )}
 
-        {/* Style Filter */}
-        {styles.length > 0 && (
-          <div className="mb-6 flex flex-wrap gap-2">
+        {/* Style Filter, Sort, and View Mode */}
+        <div className="mb-6 flex items-center justify-between gap-4">
+          {/* Style Filter */}
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedStyle('')}
               className={`px-3 py-1 rounded-full text-sm transition ${
@@ -233,10 +234,8 @@ export default function PromptsPage() {
               </button>
             ))}
           </div>
-        )}
 
-        {/* Sort and View Mode */}
-        <div className="mb-6 flex items-center justify-end gap-4">
+          {/* Sort and View Mode */}
           <div className="flex items-center gap-3">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
