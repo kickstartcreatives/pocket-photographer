@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { PhotographyTerm, Filters, ViewMode, SortOption } from '@/lib/types';
+import { usePromptBuilder } from '@/lib/usePromptBuilder';
 
 function DictionaryContent() {
   const searchParams = useSearchParams();
@@ -20,7 +21,9 @@ function DictionaryContent() {
   const [sortOption, setSortOption] = useState<SortOption>('term-asc');
   const [loading, setLoading] = useState(true);
   const [showCopied, setShowCopied] = useState(false);
-  const [selectedTerms, setSelectedTerms] = useState<string[]>([]);
+
+  // Use shared prompt builder hook
+  const { selectedTerms, toggleTerm, clearTerms, getPromptString } = usePromptBuilder();
 
   // Fetch all terms and categories
   useEffect(() => {
@@ -113,25 +116,8 @@ function DictionaryContent() {
     setTimeout(() => setShowCopied(false), 1000);
   };
 
-  const toggleTermSelection = (term: string) => {
-    console.log('Toggling term:', term);
-    console.log('Current selected:', selectedTerms);
-    setSelectedTerms(prev => {
-      const newTerms = prev.includes(term)
-        ? prev.filter(t => t !== term)
-        : [...prev, term];
-      console.log('New selected:', newTerms);
-      return newTerms;
-    });
-  };
-
   const copyAllSelected = () => {
-    const combinedPrompt = selectedTerms.join(', ');
-    copyToClipboard(combinedPrompt);
-  };
-
-  const clearSelection = () => {
-    setSelectedTerms([]);
+    copyToClipboard(getPromptString());
   };
 
   const handleViewModeChange = (mode: ViewMode) => {
@@ -183,7 +169,7 @@ function DictionaryContent() {
                 Prompt Builder ({selectedTerms.length} term{selectedTerms.length !== 1 ? 's' : ''})
               </h3>
               <button
-                onClick={clearSelection}
+                onClick={clearTerms}
                 className="text-sm text-text-secondary hover:text-navy"
               >
                 Clear All
@@ -197,7 +183,7 @@ function DictionaryContent() {
                 >
                   {term}
                   <button
-                    onClick={() => toggleTermSelection(term)}
+                    onClick={() => toggleTerm(term)}
                     className="text-orange hover:text-navy font-bold"
                   >
                     ×
@@ -207,11 +193,11 @@ function DictionaryContent() {
             </div>
             <div className="flex gap-3">
               <div className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange">
-                {selectedTerms.join(', ')}
+                {getPromptString()}
               </div>
               <button
                 onClick={copyAllSelected}
-                className="btn-primary flex items-center gap-2"
+                className="btn-orange flex items-center gap-2 hover:!bg-navy"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -301,22 +287,13 @@ function DictionaryContent() {
               <div key={term.id} className="card">
                 <div className="flex items-start gap-2 mb-3">
                   <button
-                    onClick={() => toggleTermSelection(term.element)}
+                    onClick={() => toggleTerm(term.element)}
                     className={`flex-1 text-left bg-gray-100 p-3 rounded text-sm font-mono transition ${
                       selectedTerms.includes(term.element) ? 'ring-2 ring-orange bg-orange/10' : 'hover:bg-gray-200'
                     }`}
                     title="Click to add to prompt builder"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="flex-1">{term.element}</span>
-                      {selectedTerms.includes(term.element) && (
-                        <span className="text-orange" title="Added to prompt builder">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                            <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
+                    {term.element}
                   </button>
                   <button
                     onClick={() => copyToClipboard(term.element)}
@@ -360,7 +337,7 @@ function DictionaryContent() {
                     <td className="p-3">
                       <div className="relative inline-block min-w-[120px]">
                         <button
-                          onClick={() => toggleTermSelection(term.element)}
+                          onClick={() => toggleTerm(term.element)}
                           className={`w-full text-left bg-gray-200 p-2 rounded text-sm font-mono pr-8 border transition ${
                             selectedTerms.includes(term.element)
                               ? 'ring-2 ring-orange bg-orange/10 border-orange'
@@ -368,16 +345,7 @@ function DictionaryContent() {
                           }`}
                           title="Click to add to prompt builder"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="flex-1">{term.element}</span>
-                            {selectedTerms.includes(term.element) && (
-                              <span className="text-orange absolute right-8" title="Added to prompt builder">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                                </svg>
-                              </span>
-                            )}
-                          </div>
+                          {term.element}
                         </button>
                         <button
                           onClick={(e) => {
