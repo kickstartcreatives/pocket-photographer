@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { createClient } from '@supabase/supabase-js';
 import { PhotographyTerm, PromptLibraryItem } from '@/lib/types';
 import ImageUpload from '@/components/ImageUpload';
 import { getAIPlatforms, saveAIPlatforms, DEFAULT_AI_PLATFORMS } from '@/lib/ai-platforms';
@@ -9,6 +9,14 @@ import { getAIPlatforms, saveAIPlatforms, DEFAULT_AI_PLATFORMS } from '@/lib/ai-
 type Tab = 'terms' | 'prompts' | 'platforms';
 
 export default function AdminPage() {
+  // Create supabase client on the client side only
+  const supabaseAdmin = typeof window !== 'undefined'
+    ? createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      )
+    : null;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -129,6 +137,11 @@ export default function AdminPage() {
       fetchPrompts();
     }
   };
+
+  // Early return if supabase isn't initialized (during SSR)
+  if (!supabaseAdmin) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return (
