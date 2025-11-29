@@ -15,7 +15,6 @@ export interface PromptLibraryItem {
   id: string;
   title: string;
   description?: string;
-  full_prompt: string;
   complete_prompt?: string;
   ai_platform: string;
   image_url?: string;
@@ -36,4 +35,4 @@ export interface Filters {
 export type ViewMode = 'card' | 'table';
 
 // Sort options
-export type SortOption = 'term-asc' | 'term-desc' | 'category';
+export type SortOption = '' | 'random' | 'term-asc' | 'term-desc' | 'category';

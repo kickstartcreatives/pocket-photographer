@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { PhotographyTerm, Filters, ViewMode, SortOption } from '@/lib/types';
+import { usePromptBuilder } from '@/lib/usePromptBuilder';
 
 function DictionaryContent() {
   const searchParams = useSearchParams();
@@ -13,14 +14,18 @@ function DictionaryContent() {
   const [filters, setFilters] = useState<Filters>({ search: '', categories: [] });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('dictionaryViewMode') as ViewMode) || 'card';
+      return (localStorage.getItem('dictionaryViewMode') as ViewMode) || 'table';
     }
-    return 'card';
+    return 'table';
   });
-  const [sortOption, setSortOption] = useState<SortOption>('term-asc');
+  const [sortOption, setSortOption] = useState<SortOption>('' as SortOption);
   const [loading, setLoading] = useState(true);
   const [showCopied, setShowCopied] = useState(false);
-  const [selectedTerms, setSelectedTerms] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Use shared prompt builder hook
+  const { selectedTerms, toggleTerm, clearTerms, getPromptString } = usePromptBuilder();
 
   // Fetch all terms and categories
   useEffect(() => {
@@ -78,20 +83,30 @@ function DictionaryContent() {
     }
 
     // Apply sorting
-    result.sort((a, b) => {
-      switch (sortOption) {
-        case 'term-asc':
-          return a.element.localeCompare(b.element);
-        case 'term-desc':
-          return b.element.localeCompare(a.element);
-        case 'category':
-          return a.category.localeCompare(b.category) || a.element.localeCompare(b.element);
-        default:
-          return 0;
+    if (sortOption === 'random' || sortOption === '') {
+      // Fisher-Yates shuffle for random order (default when no sort selected)
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
       }
-    });
+    } else {
+      result.sort((a, b) => {
+        switch (sortOption) {
+          case 'term-asc':
+            return a.element.localeCompare(b.element);
+          case 'term-desc':
+            return b.element.localeCompare(a.element);
+          case 'category':
+            return a.category.localeCompare(b.category) || a.element.localeCompare(b.element);
+          default:
+            return 0;
+        }
+      });
+    }
 
     setFilteredTerms(result);
+    // Reset to page 1 when filters or sorting changes
+    setCurrentPage(1);
   }, [filters, sortOption, terms]);
 
   const toggleCategory = (category: string) => {
@@ -113,25 +128,8 @@ function DictionaryContent() {
     setTimeout(() => setShowCopied(false), 1000);
   };
 
-  const toggleTermSelection = (term: string) => {
-    console.log('Toggling term:', term);
-    console.log('Current selected:', selectedTerms);
-    setSelectedTerms(prev => {
-      const newTerms = prev.includes(term)
-        ? prev.filter(t => t !== term)
-        : [...prev, term];
-      console.log('New selected:', newTerms);
-      return newTerms;
-    });
-  };
-
   const copyAllSelected = () => {
-    const combinedPrompt = selectedTerms.join(', ');
-    copyToClipboard(combinedPrompt);
-  };
-
-  const clearSelection = () => {
-    setSelectedTerms([]);
+    copyToClipboard(getPromptString());
   };
 
   const handleViewModeChange = (mode: ViewMode) => {
@@ -147,8 +145,15 @@ function DictionaryContent() {
     );
   }
 
+  // Pagination calculations
+  const totalItems = filteredTerms.length;
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  const startIndex = itemsPerPage === -1 ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex = itemsPerPage === -1 ? totalItems : startIndex + itemsPerPage;
+  const paginatedTerms = filteredTerms.slice(startIndex, endIndex);
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" onContextMenu={(e) => e.preventDefault()}>
       {/* Copied Toast Notification */}
       {showCopied && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-navy text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2">
@@ -183,7 +188,7 @@ function DictionaryContent() {
                 Prompt Builder ({selectedTerms.length} term{selectedTerms.length !== 1 ? 's' : ''})
               </h3>
               <button
-                onClick={clearSelection}
+                onClick={clearTerms}
                 className="text-sm text-text-secondary hover:text-navy"
               >
                 Clear All
@@ -197,7 +202,7 @@ function DictionaryContent() {
                 >
                   {term}
                   <button
-                    onClick={() => toggleTermSelection(term)}
+                    onClick={() => toggleTerm(term)}
                     className="text-orange hover:text-navy font-bold"
                   >
                     ×
@@ -207,11 +212,11 @@ function DictionaryContent() {
             </div>
             <div className="flex gap-3">
               <div className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange">
-                {selectedTerms.join(', ')}
+                {getPromptString()}
               </div>
               <button
                 onClick={copyAllSelected}
-                className="btn-primary flex items-center gap-2"
+                className="btn-orange flex items-center gap-2 hover:!bg-navy"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -237,11 +242,30 @@ function DictionaryContent() {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value as SortOption)}
-            className="px-4 py-2 border border-border-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-teal"
+            className="px-4 py-2 border border-border-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-teal text-gray-400"
+            style={sortOption !== '' ? { color: 'inherit' } : undefined}
           >
+            <option value="" disabled>Sort</option>
             <option value="term-asc">A-Z</option>
             <option value="term-desc">Z-A</option>
             <option value="category">By Category</option>
+            <option value="random">Random</option>
+          </select>
+
+          {/* Items Per Page */}
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="px-4 py-2 border border-border-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-teal"
+          >
+            <option value={10}>10 per page</option>
+            <option value={20}>20 per page</option>
+            <option value={50}>50 per page</option>
+            <option value={100}>100 per page</option>
+            <option value={-1}>All</option>
           </select>
 
           {/* View Mode */}
@@ -297,26 +321,17 @@ function DictionaryContent() {
         {/* Terms Display */}
         {viewMode === 'card' ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTerms.map(term => (
+            {paginatedTerms.map(term => (
               <div key={term.id} className="card">
                 <div className="flex items-start gap-2 mb-3">
                   <button
-                    onClick={() => toggleTermSelection(term.element)}
+                    onClick={() => toggleTerm(term.element)}
                     className={`flex-1 text-left bg-gray-100 p-3 rounded text-sm font-mono transition ${
                       selectedTerms.includes(term.element) ? 'ring-2 ring-orange bg-orange/10' : 'hover:bg-gray-200'
                     }`}
                     title="Click to add to prompt builder"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="flex-1">{term.element}</span>
-                      {selectedTerms.includes(term.element) && (
-                        <span className="text-orange" title="Added to prompt builder">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                            <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
+                    {term.element}
                   </button>
                   <button
                     onClick={() => copyToClipboard(term.element)}
@@ -355,12 +370,12 @@ function DictionaryContent() {
                 </tr>
               </thead>
               <tbody>
-                {filteredTerms.map(term => (
+                {paginatedTerms.map(term => (
                   <tr key={term.id} className="border-b border-border-gray hover:bg-gray-50">
                     <td className="p-3">
                       <div className="relative inline-block min-w-[120px]">
                         <button
-                          onClick={() => toggleTermSelection(term.element)}
+                          onClick={() => toggleTerm(term.element)}
                           className={`w-full text-left bg-gray-200 p-2 rounded text-sm font-mono pr-8 border transition ${
                             selectedTerms.includes(term.element)
                               ? 'ring-2 ring-orange bg-orange/10 border-orange'
@@ -368,16 +383,7 @@ function DictionaryContent() {
                           }`}
                           title="Click to add to prompt builder"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="flex-1">{term.element}</span>
-                            {selectedTerms.includes(term.element) && (
-                              <span className="text-orange absolute right-8" title="Added to prompt builder">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                                </svg>
-                              </span>
-                            )}
-                          </div>
+                          {term.element}
                         </button>
                         <button
                           onClick={(e) => {
@@ -410,6 +416,58 @@ function DictionaryContent() {
             <button onClick={clearFilters} className="btn-primary mt-4">
               Clear Filters
             </button>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {filteredTerms.length > 0 && itemsPerPage !== -1 && (
+          <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-text-secondary">
+              Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} terms
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-border-gray rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                Previous
+              </button>
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-4 py-2 border rounded-lg transition ${
+                        currentPage === pageNum
+                          ? 'bg-orange text-white border-orange'
+                          : 'border-border-gray hover:bg-gray-100'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-border-gray rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

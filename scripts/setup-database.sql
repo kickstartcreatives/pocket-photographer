@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS prompt_library (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  full_prompt TEXT NOT NULL,
+  complete_prompt TEXT,
   ai_platform TEXT NOT NULL,
   image_url TEXT,
   terms_used TEXT[] NOT NULL,
