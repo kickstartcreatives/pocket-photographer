@@ -877,10 +877,11 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Terms Used (comma-separated)
+                Terms Used (comma-separated) *
               </label>
               <input
                 type="text"
+                required
                 value={Array.isArray(formData.terms_used) ? formData.terms_used.join(', ') : ''}
                 onChange={(e) => setFormData({
                   ...formData,
@@ -911,9 +912,10 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Description *
                 </label>
                 <textarea
+                  required
                   rows={2}
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -923,9 +925,10 @@ function PromptForm({ prompt, aiPlatforms, onClose, onSave, showToast }: {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  What to Expect
+                  What to Expect *
                 </label>
                 <textarea
+                  required
                   rows={2}
                   value={formData.what_to_expect || ''}
                   onChange={(e) => setFormData({ ...formData, what_to_expect: e.target.value })}
