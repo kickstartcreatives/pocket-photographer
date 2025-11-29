@@ -16,9 +16,9 @@ export default function PromptsPage() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('promptsViewMode') as ViewMode) || 'card';
+      return (localStorage.getItem('promptsViewMode') as ViewMode) || 'table';
     }
-    return 'card';
+    return 'table';
   });
   const [showContactModal, setShowContactModal] = useState(false);
   const [sortBy, setSortBy] = useState<'a-z' | 'z-a' | 'category' | ''>('' as 'a-z' | 'z-a' | 'category');
