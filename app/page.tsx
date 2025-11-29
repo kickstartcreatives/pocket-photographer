@@ -15,12 +15,8 @@ export default function HomePage() {
 
       {/* Main content */}
       <main className="max-w-6xl mx-auto px-4 py-16">
-        {/* Intro Paragraph */}
-        <p className="text-text-primary text-lg md:text-xl text-center mb-12 max-w-4xl mx-auto" style={{textWrap: 'balance', lineHeight: '1.7'}}>
-          Photography terms are the <strong>hidden tools</strong> behind cinematic lighting, blurry depth, and golden color. Pocket Photographer explains these concepts in <strong>plain language</strong> so you can build better AI prompts. Explore the dictionary or browse our prompt library for ready-made examples.
-        </p>
         {/* How It Works */}
-        <div className="max-w-4xl mx-auto mb-20 mt-16">
+        <div className="max-w-4xl mx-auto mb-16">
           <h2 className="text-4xl font-bold text-center mb-12" style={{color: '#CC4106'}}>
             How It Works
           </h2>
@@ -55,16 +51,16 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="border-t border-gray-300 my-16 max-w-4xl mx-auto"></div>
+
         {/* Feature Cards */}
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="card hover:shadow-lg transition text-center flex flex-col px-10">
             <div className="text-6xl mb-4">📖</div>
             <h3 className="text-2xl font-bold mb-3">Browse Dictionary</h3>
-            <p className="text-text-secondary mb-3 px-4" style={{textWrap: 'balance'}}>
+            <p className="text-text-secondary mb-6 px-4 flex-grow" style={{textWrap: 'balance'}}>
               Explore 245+ professional photography terms organized by category—from aperture settings like <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">f/1.4</span> to lighting techniques like <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">golden hour</span>. Each term includes plain-English explanations and what it does to your image.
-            </p>
-            <p className="text-text-secondary text-sm mb-4 flex-grow px-4" style={{textWrap: 'balance'}}>
-              See best use cases and ready-to-use examples for every term. Click terms to add them to your custom prompt builder, then copy your complete prompt to use in any AI tool.
             </p>
             <a href="/dictionary" className="btn-orange inline-block mt-auto">Get Started →</a>
           </div>
@@ -72,11 +68,8 @@ export default function HomePage() {
           <div className="card hover:shadow-lg transition text-center flex flex-col px-10">
             <div className="text-6xl mb-4">⚡</div>
             <h3 className="text-2xl font-bold mb-3">View Prompt Library</h3>
-            <p className="text-text-secondary mb-3 px-4" style={{textWrap: 'balance'}}>
+            <p className="text-text-secondary mb-6 px-4 flex-grow" style={{textWrap: 'balance'}}>
               See finished AI images paired with the exact photography terms and complete prompts that created them. Each example includes the result image, photography terminology used, and the full AI prompt.
-            </p>
-            <p className="text-text-secondary text-sm mb-4 flex-grow px-4" style={{textWrap: 'balance'}}>
-              Start with free examples, then unlock the full library of advanced prompts for complex lighting, composition, and style combinations. Copy complete prompts with one click and paste directly into any AI tool.
             </p>
             <a href="/prompts" className="btn-orange inline-block mt-auto">Browse Prompts →</a>
           </div>
