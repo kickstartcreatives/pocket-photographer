@@ -6,7 +6,6 @@ export interface PhotographyTerm {
   what_it_does: string;
   best_used_for: string;
   example_prompt_usage: string;
-  prompt_style?: string;
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +20,7 @@ export interface PromptLibraryItem {
   image_url?: string;
   terms_used: string[];
   category?: string;
+  style?: string;
   what_to_expect?: string;
   created_at: string;
   updated_at: string;

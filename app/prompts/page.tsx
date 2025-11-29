@@ -9,8 +9,8 @@ import { usePromptBuilder } from '@/lib/usePromptBuilder';
 export default function PromptsPage() {
   const [prompts, setPrompts] = useState<PromptLibraryItem[]>([]);
   const [filteredPrompts, setFilteredPrompts] = useState<PromptLibraryItem[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [styles, setStyles] = useState<string[]>([]);
+  const [selectedStyle, setSelectedStyle] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [showCopied, setShowCopied] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -42,11 +42,11 @@ export default function PromptsPage() {
         setPrompts(data);
         setFilteredPrompts(data);
 
-        // Extract unique categories
-        const uniqueCategories = Array.from(
-          new Set(data.map(p => p.category).filter(Boolean))
+        // Extract unique styles
+        const uniqueStyles = Array.from(
+          new Set(data.map(p => p.style).filter(Boolean))
         ).sort();
-        setCategories(uniqueCategories as string[]);
+        setStyles(uniqueStyles as string[]);
       }
 
       setLoading(false);
@@ -55,10 +55,10 @@ export default function PromptsPage() {
     fetchPrompts();
   }, []);
 
-  // Apply category filter and sorting
+  // Apply style filter and sorting
   useEffect(() => {
-    let filtered = selectedCategory
-      ? prompts.filter(p => p.category === selectedCategory)
+    let filtered = selectedStyle
+      ? prompts.filter(p => p.style === selectedStyle)
       : prompts;
 
     // Apply sorting (if no sort selected, keep original order)
@@ -77,7 +77,7 @@ export default function PromptsPage() {
     }
 
     setFilteredPrompts(sorted);
-  }, [selectedCategory, prompts, sortBy]);
+  }, [selectedStyle, prompts, sortBy]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -206,32 +206,32 @@ export default function PromptsPage() {
           </div>
         )}
 
-        {/* Category Filter, Sort, and View Mode */}
+        {/* Style Filter, Sort, and View Mode */}
         <div className="mb-6 flex items-center justify-between gap-4">
-          {/* Category Filter */}
-          {categories.length > 0 && (
+          {/* Style Filter */}
+          {styles.length > 0 && (
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setSelectedCategory('')}
+                onClick={() => setSelectedStyle('')}
                 className={`px-3 py-1 rounded-full text-sm transition ${
-                  !selectedCategory
+                  !selectedStyle
                     ? 'bg-orange text-white'
                     : 'bg-gray-200 text-text-primary hover:bg-gray-300'
                 }`}
               >
                 All Styles
               </button>
-              {categories.map(category => (
+              {styles.map(style => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={style}
+                  onClick={() => setSelectedStyle(style)}
                   className={`px-3 py-1 rounded-full text-sm transition ${
-                    selectedCategory === category
+                    selectedStyle === style
                       ? 'bg-orange text-white'
                       : 'bg-gray-200 text-text-primary hover:bg-gray-300'
                   }`}
                 >
-                  {category}
+                  {style}
                 </button>
               ))}
             </div>

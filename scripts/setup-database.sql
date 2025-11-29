@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS photography_terms (
   what_it_does TEXT NOT NULL,
   best_used_for TEXT NOT NULL,
   example_prompt_usage TEXT NOT NULL,
-  prompt_style TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -21,6 +20,7 @@ CREATE TABLE IF NOT EXISTS prompt_library (
   image_url TEXT,
   terms_used TEXT[] NOT NULL,
   category TEXT,
+  style TEXT,
   what_to_expect TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
