@@ -367,15 +367,15 @@ export default function PromptsPage() {
                         </svg>
                       </button>
                     </div>
-                    <p className="text-sm font-mono text-text-primary bg-white p-2 rounded border border-teal/20">
+                    <div className="text-sm font-mono text-text-primary bg-white p-2 rounded border border-teal/20 h-24 overflow-y-auto">
                       {prompt.complete_prompt}
-                    </p>
+                    </div>
                   </div>
                 )}
 
                 {/* What to Expect */}
                 {prompt.what_to_expect && (
-                  <div className="text-sm">
+                  <div className="text-sm mt-4">
                     <strong className="text-text-primary">What to Expect:</strong>
                     <p className="text-text-secondary mt-1">{prompt.what_to_expect}</p>
                   </div>
@@ -466,6 +466,14 @@ export default function PromptsPage() {
                     <p className="text-sm font-mono text-text-primary bg-white p-2 rounded border border-teal/20">
                       {prompt.complete_prompt}
                     </p>
+                  </div>
+                )}
+
+                {/* What to Expect */}
+                {prompt.what_to_expect && (
+                  <div className="text-sm mt-3">
+                    <strong className="text-text-primary">What to Expect:</strong>
+                    <p className="text-text-secondary mt-1">{prompt.what_to_expect}</p>
                   </div>
                 )}
               </div>

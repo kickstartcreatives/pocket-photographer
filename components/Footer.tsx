@@ -23,6 +23,13 @@ export default function Footer() {
               >
                 Let us know
               </button>
+              {' · '}
+              <a
+                href="/admin"
+                className="text-gray-400 hover:text-gray-600 transition text-xs"
+              >
+                Admin
+              </a>
             </p>
           </div>
         </div>
