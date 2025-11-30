@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 
+// Navigation component with hover effects
+
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
