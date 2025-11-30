@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ContactModal from './ContactModal';
 
+// Footer component
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [showContactModal, setShowContactModal] = useState(false);
