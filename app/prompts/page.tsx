@@ -146,17 +146,9 @@ export default function PromptsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Instructions */}
         <div className="bg-orange/10 border-2 border-orange rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <p className="text-text-primary text-sm">
-              <strong>How to use:</strong> Click any image to view it full size. Click any dictionary term from any image below OR visit the Dictionary page to add terms to your Prompt Builder. Mix and match any terms from the dictionary to create your own custom AI image prompts!
-            </p>
-            <button
-              onClick={() => setShowContactModal(true)}
-              className="text-sm text-teal hover:text-orange transition font-medium underline whitespace-nowrap ml-4"
-            >
-              📬 Request a prompt
-            </button>
-          </div>
+          <p className="text-text-primary text-sm">
+            <strong>How to use:</strong> Click any image to view it full size. Click any dictionary term from any image below OR visit the Dictionary page to add terms to your Prompt Builder. Mix and match any terms from the dictionary to create your own custom AI image prompts!
+          </p>
         </div>
 
         {/* Prompt Builder Panel - Shows when terms are selected */}
@@ -235,7 +227,7 @@ export default function PromptsPage() {
             ))}
           </div>
 
-          {/* Sort and View Mode */}
+          {/* Sort, View Mode, and Request */}
           <div className="flex items-center gap-3">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">

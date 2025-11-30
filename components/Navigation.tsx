@@ -11,10 +11,9 @@ export default function Navigation() {
     <nav className="bg-white border-b border-border-gray">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1.5 text-xl font-bold text-navy font-montserrat uppercase tracking-wide">
+          <Link href="/" className="flex items-center gap-1.5 text-xl font-bold text-navy">
             <Image src="/logo.png" alt="Pocket Photographer" width={40} height={40} className="w-10 h-10" />
-            <span className="hidden sm:inline">Pocket Photographer</span>
-            <span className="sm:hidden">PP</span>
+            <span>pocket photographer</span>
           </Link>
 
           {/* Desktop Navigation */}

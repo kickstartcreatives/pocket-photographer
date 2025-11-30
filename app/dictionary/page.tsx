@@ -353,26 +353,45 @@ function DictionaryContent() {
                     <p className="text-text-secondary">{term.best_used_for}</p>
                   </div>
                   <div>
-                    <strong className="text-text-primary">Example Usage:</strong>
-                    <p className="text-text-secondary">{term.example_prompt_usage}</p>
+                    <strong className="text-text-primary">Prompt Example:</strong>
+                    <div className="flex gap-2 mt-1">
+                      <button
+                        onClick={() => toggleTerm(term.example_prompt_usage)}
+                        className={`flex-1 text-left bg-gray-100 p-2 rounded text-sm transition ${
+                          selectedTerms.includes(term.example_prompt_usage) ? 'ring-2 ring-orange bg-orange/10' : 'hover:bg-gray-200'
+                        }`}
+                        title="Click to add to prompt builder"
+                      >
+                        {term.example_prompt_usage}
+                      </button>
+                      <button
+                        onClick={() => copyToClipboard(term.example_prompt_usage)}
+                        className="bg-gray-100 p-2 rounded text-orange hover:text-navy hover:bg-gray-200 transition"
+                        title="Copy example prompt"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-teal text-white">
-                  <th className="p-3 text-left">Term</th>
+                <tr className="bg-teal text-white shadow-lg">
+                  <th className="p-3 text-left first:rounded-tl-lg">Term</th>
                   <th className="p-3 text-left">Category</th>
                   <th className="p-3 text-left">What It Does</th>
                   <th className="p-3 text-left">Best Used For</th>
-                  <th className="p-3 text-left">Example Usage</th>
+                  <th className="p-3 text-left last:rounded-tr-lg">Prompt Example</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white">
                 {paginatedTerms.map(term => (
                   <tr key={term.id} className="border-b border-border-gray hover:bg-gray-50">
                     <td className="p-3">
@@ -405,7 +424,33 @@ function DictionaryContent() {
                     <td className="p-3 text-sm">{term.category}</td>
                     <td className="p-3 text-sm">{term.what_it_does}</td>
                     <td className="p-3 text-sm">{term.best_used_for}</td>
-                    <td className="p-3 text-sm">{term.example_prompt_usage}</td>
+                    <td className="p-3">
+                      <div className="relative inline-block min-w-[200px]">
+                        <button
+                          onClick={() => toggleTerm(term.example_prompt_usage)}
+                          className={`w-full text-left bg-gray-200 p-2 rounded text-sm pr-8 border transition ${
+                            selectedTerms.includes(term.example_prompt_usage)
+                              ? 'ring-2 ring-orange bg-orange/10 border-orange'
+                              : 'border-gray-300 hover:bg-gray-300'
+                          }`}
+                          title="Click to add to prompt builder"
+                        >
+                          {term.example_prompt_usage}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(term.example_prompt_usage);
+                          }}
+                          className="absolute top-1 right-1 text-orange hover:text-navy transition"
+                          title="Copy example prompt"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
