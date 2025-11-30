@@ -13,7 +13,13 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <p className="text-sm text-text-secondary mb-3">
-              © {currentYear} Kickstart Creatives. All rights reserved.
+              © {currentYear} Kickstart Creatives. All rights reserved.{' · '}
+              <a
+                href="/admin"
+                className="text-gray-400 hover:text-gray-600 transition text-xs"
+              >
+                Admin
+              </a>
             </p>
             <p className="text-sm text-text-secondary">
               Have a suggestion or feedback?{' '}
@@ -23,13 +29,6 @@ export default function Footer() {
               >
                 Let us know
               </button>
-              {' · '}
-              <a
-                href="/admin"
-                className="text-gray-400 hover:text-gray-600 transition text-xs"
-              >
-                Admin
-              </a>
             </p>
           </div>
         </div>
