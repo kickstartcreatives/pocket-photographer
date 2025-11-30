@@ -8,7 +8,7 @@ export default function HomePage() {
             Pocket Photographer
           </h1>
           <p className="text-xl md:text-2xl opacity-90">
-            A master photographer <em>in your pocket</em>
+            A master photographer. <em>In your pocket.</em>
           </p>
         </div>
       </header>
