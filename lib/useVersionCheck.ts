@@ -2,18 +2,24 @@
 
 import { useEffect, useState } from 'react';
 
-const APP_VERSION = '1.0.1'; // Update this when deploying changes
-
 export function useVersionCheck() {
   const [showUpdateNotice, setShowUpdateNotice] = useState(false);
 
   useEffect(() => {
-    const checkVersion = () => {
-      const storedVersion = localStorage.getItem('appVersion');
-      if (storedVersion && storedVersion !== APP_VERSION) {
-        setShowUpdateNotice(true);
-      } else if (!storedVersion) {
-        localStorage.setItem('appVersion', APP_VERSION);
+    const checkVersion = async () => {
+      try {
+        const response = await fetch('/version.json?' + new Date().getTime());
+        const data = await response.json();
+        const currentVersion = data.timestamp.toString();
+        const storedVersion = localStorage.getItem('appVersion');
+
+        if (storedVersion && storedVersion !== currentVersion) {
+          setShowUpdateNotice(true);
+        } else if (!storedVersion) {
+          localStorage.setItem('appVersion', currentVersion);
+        }
+      } catch (error) {
+        console.error('Failed to check version:', error);
       }
     };
 
@@ -38,10 +44,17 @@ export function useVersionCheck() {
     };
   }, []);
 
-  const handleReload = () => {
-    localStorage.setItem('appVersion', APP_VERSION);
-    window.location.reload();
+  const handleReload = async () => {
+    try {
+      const response = await fetch('/version.json?' + new Date().getTime());
+      const data = await response.json();
+      localStorage.setItem('appVersion', data.timestamp.toString());
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to update version:', error);
+      window.location.reload();
+    }
   };
 
-  return { showUpdateNotice, handleReload, APP_VERSION };
+  return { showUpdateNotice, handleReload };
 }
