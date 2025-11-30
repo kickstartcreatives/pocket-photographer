@@ -1,5 +1,6 @@
 'use client';
 
+// Update notice banner component
 interface UpdateNoticeProps {
   onReload: () => void;
 }
