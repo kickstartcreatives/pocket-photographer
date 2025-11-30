@@ -14,7 +14,10 @@ function DictionaryContent() {
   const [filters, setFilters] = useState<Filters>({ search: '', categories: [] });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('dictionaryViewMode') as ViewMode) || 'table';
+      const saved = localStorage.getItem('dictionaryViewMode') as ViewMode;
+      if (saved) return saved;
+      // Default to card on mobile, table on desktop
+      return window.innerWidth < 768 ? 'card' : 'table';
     }
     return 'table';
   });
