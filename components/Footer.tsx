@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import ContactModal from './ContactModal';
 
-// Footer component
+// Footer component for Pocket Photographer
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [showContactModal, setShowContactModal] = useState(false);
