@@ -178,8 +178,7 @@ function DictionaryContent() {
         {/* Instructions */}
         <div className="bg-orange/10 border-2 border-orange rounded-lg p-4 mb-6">
           <p className="text-text-primary text-sm">
-            <strong>How to use:</strong> Click any term box to add it to your Prompt Builder, or click the copy icon to copy a single term.
-            Build your perfect AI image prompt by selecting multiple terms, then copy them all at once!
+            <strong>How to use:</strong> Click any term to start your Prompt Builder. You can type or edit directly in the builder box to customize your prompt. Mix and match terms from both the Dictionary and Prompts pages - your builder syncs across both!
           </p>
         </div>
 

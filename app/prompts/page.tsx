@@ -147,7 +147,7 @@ export default function PromptsPage() {
         {/* Instructions */}
         <div className="bg-orange/10 border-2 border-orange rounded-lg p-4 mb-6">
           <p className="text-text-primary text-sm">
-            <strong>How to use:</strong> Click any image to view it full size. Click any dictionary term from any image below OR visit the Dictionary page to add terms to your Prompt Builder. Mix and match any terms from the dictionary to create your own custom AI image prompts!
+            <strong>How to use:</strong> Click images to view full size. Click dictionary terms to add them to your Prompt Builder, or visit the Dictionary page for the full collection. Build custom prompts by mixing terms and editing directly in the builder box!
           </p>
         </div>
 
