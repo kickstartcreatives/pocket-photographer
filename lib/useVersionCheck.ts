@@ -13,8 +13,14 @@ export function useVersionCheck() {
         const currentVersion = data.timestamp.toString();
         const storedVersion = localStorage.getItem('appVersion');
 
-        if (storedVersion && storedVersion !== currentVersion) {
-          setShowUpdateNotice(true);
+        // Check if stored version is old format (e.g. '1.0.1') or different timestamp
+        if (storedVersion && (storedVersion !== currentVersion)) {
+          // If it's the old string format, just update to new timestamp without showing banner
+          if (storedVersion.includes('.')) {
+            localStorage.setItem('appVersion', currentVersion);
+          } else if (storedVersion !== currentVersion) {
+            setShowUpdateNotice(true);
+          }
         } else if (!storedVersion) {
           localStorage.setItem('appVersion', currentVersion);
         }
