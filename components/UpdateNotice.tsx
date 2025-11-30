@@ -13,11 +13,12 @@ export default function UpdateNotice({ onReload }: UpdateNoticeProps) {
     confetti({
       particleCount: 100,
       spread: 70,
-      origin: { y: 0.8 } // Bottom of screen where button is
+      origin: { y: 0.8 }, // Bottom of screen where button is
+      colors: ['#CC4106', '#537385', '#2E475D'] // Orange, teal, navy
     });
 
-    // Wait a moment for confetti to show, then reload
-    setTimeout(onReload, 300);
+    // Wait for confetti to show, then reload
+    setTimeout(onReload, 800);
   };
 
   return (
