@@ -28,7 +28,7 @@ function DictionaryContent() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Use shared prompt builder hook
-  const { selectedTerms, toggleTerm, clearTerms, getPromptString } = usePromptBuilder();
+  const { selectedTerms, toggleTerm, clearTerms, getPromptString, setPromptString } = usePromptBuilder();
 
   // Fetch all terms and categories
   useEffect(() => {
@@ -214,9 +214,13 @@ function DictionaryContent() {
               ))}
             </div>
             <div className="flex gap-3">
-              <div className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange">
-                {getPromptString()}
-              </div>
+              <textarea
+                value={getPromptString()}
+                onChange={(e) => setPromptString(e.target.value)}
+                className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange resize-none focus:outline-none focus:ring-2 focus:ring-orange"
+                rows={3}
+                placeholder="Click terms to build your prompt, or type/edit here..."
+              />
               <button
                 onClick={copyAllSelected}
                 className="btn-orange flex items-center gap-2 hover:!bg-navy"
@@ -235,7 +239,7 @@ function DictionaryContent() {
           {/* Search */}
           <input
             type="text"
-            placeholder="Search terms..."
+            placeholder="Search..."
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             className="flex-1 px-4 py-2 border border-border-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-teal"

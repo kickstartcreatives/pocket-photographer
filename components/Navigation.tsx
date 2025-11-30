@@ -17,14 +17,11 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex gap-6">
-            <Link href="/" className="text-text-primary hover:text-teal transition">
-              Home
-            </Link>
-            <Link href="/dictionary" className="text-text-primary hover:text-teal transition">
+          <div className="hidden md:flex gap-3">
+            <Link href="/dictionary" className="px-4 py-2 rounded-lg text-navy font-medium hover:bg-teal/10 transition-all">
               Dictionary
             </Link>
-            <Link href="/prompts" className="text-text-primary hover:text-teal transition">
+            <Link href="/prompts" className="px-4 py-2 rounded-lg text-navy font-medium hover:bg-teal/10 transition-all">
               Prompts
             </Link>
           </div>
@@ -62,24 +59,17 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-2 flex flex-col gap-3">
-            <Link
-              href="/"
-              className="text-text-primary hover:text-teal transition py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
+          <div className="md:hidden mt-4 pb-2 flex flex-col gap-2">
             <Link
               href="/dictionary"
-              className="text-text-primary hover:text-teal transition py-2"
+              className="px-4 py-2 rounded-lg text-navy font-medium hover:bg-teal/10 transition-all"
               onClick={() => setIsMenuOpen(false)}
             >
               Dictionary
             </Link>
             <Link
               href="/prompts"
-              className="text-text-primary hover:text-teal transition py-2"
+              className="px-4 py-2 rounded-lg text-navy font-medium hover:bg-teal/10 transition-all"
               onClick={() => setIsMenuOpen(false)}
             >
               Prompts

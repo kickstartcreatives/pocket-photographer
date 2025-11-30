@@ -24,7 +24,7 @@ export default function PromptsPage() {
   const [sortBy, setSortBy] = useState<'a-z' | 'z-a' | 'category' | ''>('' as 'a-z' | 'z-a' | 'category');
 
   // Use shared prompt builder hook
-  const { selectedTerms, toggleTerm, clearTerms, getPromptString } = usePromptBuilder();
+  const { selectedTerms, toggleTerm, clearTerms, getPromptString, setPromptString } = usePromptBuilder();
 
   // Fetch all prompts
   useEffect(() => {
@@ -182,9 +182,13 @@ export default function PromptsPage() {
               ))}
             </div>
             <div className="flex gap-3">
-              <div className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange">
-                {getPromptString()}
-              </div>
+              <textarea
+                value={getPromptString()}
+                onChange={(e) => setPromptString(e.target.value)}
+                className="flex-1 bg-white p-3 rounded font-mono text-sm border border-orange resize-none focus:outline-none focus:ring-2 focus:ring-orange"
+                rows={3}
+                placeholder="Click terms to build your prompt, or type/edit here..."
+              />
               <button
                 onClick={() => copyToClipboard(getPromptString())}
                 className="btn-orange flex items-center gap-2 hover:!bg-navy"

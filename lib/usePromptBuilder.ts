@@ -6,6 +6,7 @@ const STORAGE_KEY = 'pocket-photographer-prompt-builder';
 
 export function usePromptBuilder() {
   const [selectedTerms, setSelectedTerms] = useState<string[]>([]);
+  const [promptText, setPromptText] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
 
   // Initialize from localStorage on client mount
@@ -17,6 +18,7 @@ export function usePromptBuilder() {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           setSelectedTerms(parsed);
+          setPromptText(parsed.join(', '));
         }
       } catch (e) {
         console.error('Failed to parse stored prompt builder data:', e);
@@ -24,7 +26,7 @@ export function usePromptBuilder() {
     }
   }, []);
 
-  // Sync to localStorage whenever selectedTerms changes
+  // Sync promptText when selectedTerms changes (but not from manual edit)
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedTerms));
@@ -46,19 +48,25 @@ export function usePromptBuilder() {
 
   const toggleTerm = (term: string) => {
     setSelectedTerms(prev => {
-      if (prev.includes(term)) {
-        return prev.filter(t => t !== term);
-      }
-      return [...prev, term];
+      const newTerms = prev.includes(term)
+        ? prev.filter(t => t !== term)
+        : [...prev, term];
+      setPromptText(newTerms.join(', '));
+      return newTerms;
     });
   };
 
   const clearTerms = () => {
     setSelectedTerms([]);
+    setPromptText('');
   };
 
   const getPromptString = () => {
-    return selectedTerms.join(', ');
+    return promptText;
+  };
+
+  const setPromptString = (text: string) => {
+    setPromptText(text);
   };
 
   return {
@@ -68,6 +76,7 @@ export function usePromptBuilder() {
     toggleTerm,
     clearTerms,
     getPromptString,
+    setPromptString,
     isClient
   };
 }
